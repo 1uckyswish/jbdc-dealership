@@ -1,50 +1,35 @@
-package com.yearup.dealership;
+package com.yearup.jbdcdealership.models;
 
 import java.text.DecimalFormat;
 
 public class Vehicle {
-    private int vin;
+    private String vin;
     private int year;
     private String make;
     private String model;
-    private String vehicleType; // Car, Truck, Van, etc..
+    private String type;
     private String color;
     private int odometer;
     private double price;
+    private String sold;
 
-    /**
-     * This will make a single vehicle and its attributes for it
-     *
-     * @param vin
-     * @param year
-     * @param make
-     * @param model
-     * @param vehicleType
-     * @param color
-     * @param odometer
-     * @param price
-     */
-    public Vehicle(int vin, int year, String make, String model, String vehicleType, String color, int odometer,
-                   double price) {
+    public Vehicle(String vin, int year, String make, String model, String type, String color, int odometer, double price, String sold) {
         this.vin = vin;
         this.year = year;
         this.make = make;
         this.model = model;
-        this.vehicleType = vehicleType;
+        this.type = type;
         this.color = color;
         this.odometer = odometer;
         this.price = price;
+        this.sold = sold;
     }
 
-    /**
-     * //Create its getters and setters for attributes
-     *
-     */
-    public int getVin() {
+    public String getVin() {
         return vin;
     }
 
-    public void setVin(int vin) {
+    public void setVin(String vin) {
         this.vin = vin;
     }
 
@@ -72,12 +57,12 @@ public class Vehicle {
         this.model = model;
     }
 
-    public String getVehicleType() {
-        return vehicleType;
+    public String getType() {
+        return type;
     }
 
-    public void setVehicleType(String vehicleType) {
-        this.vehicleType = vehicleType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getColor() {
@@ -104,6 +89,14 @@ public class Vehicle {
         this.price = price;
     }
 
+    public String getSold() {
+        return sold;
+    }
+
+    public void setSold(String sold) {
+        this.sold = sold;
+    }
+
     /**
      * Formatted way to display the attributes in a well-structured way for user to read
      *
@@ -128,7 +121,7 @@ public class Vehicle {
         formattedString.append("║").append(padding).append("Year: ").append(year).append("\n");
         formattedString.append("║").append(padding).append("Make: ").append(make).append("\n");
         formattedString.append("║").append(padding).append("Model: ").append(model).append("\n");
-        formattedString.append("║").append(padding).append("Vehicle Type: ").append(vehicleType).append("\n");
+        formattedString.append("║").append(padding).append("Vehicle Type: ").append(type).append("\n");
         formattedString.append("║").append(padding).append("Color: ").append(color).append("\n");
         formattedString.append("║").append(padding).append("Odometer: ").append(formattedOdometer).append(" miles\n");
         formattedString.append("║").append(padding).append("Price: $").append(formattedPrice).append("\n");
@@ -136,5 +129,4 @@ public class Vehicle {
 
         return formattedString.toString();
     }
-
 }

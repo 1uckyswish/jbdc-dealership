@@ -1,4 +1,4 @@
-package com.yearup.dealership.UtilityMethods;
+package com.yearup.jbdcdealership.utilityMethods;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -99,20 +99,4 @@ public class UtilityMethods {
         // return the user input
         return input;
     }
-
-    /**
-     * Gets the current date and returns it as a formatted string.
-     * @return A string representation of the current date in the format 'yyyyMMdd'.
-     */
-    public static String contractDateStamp() {
-        // Get the current date
-        LocalDate currentDate = LocalDate.now();
-
-        // Format the date as 'yyyyMMdd'
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formattedDate = currentDate.format(formatter);
-
-        return formattedDate;
-    }
-
 }
