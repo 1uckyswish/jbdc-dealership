@@ -298,9 +298,9 @@ public class DatabaseDealerDao implements DealerDao {
         try (Connection connection = dataSource.getConnection()) {
             // Check if there are associated records in the inventory table
             String checkInventoryQuery = "SELECT COUNT(*) FROM inventory WHERE vin = ?";
-            try (PreparedStatement checkStatement = connection.prepareStatement(checkInventoryQuery)) {
-                checkStatement.setString(1, vin);
-                try (ResultSet resultSet = checkStatement.executeQuery()) {
+            try (PreparedStatement checkInventoryStatement = connection.prepareStatement(checkInventoryQuery)) {
+                checkInventoryStatement.setString(1, vin);
+                try (ResultSet resultSet = checkInventoryStatement.executeQuery()) {
                     resultSet.next();
                     int count = resultSet.getInt(1);
                     if (count > 0) {
@@ -314,12 +314,48 @@ public class DatabaseDealerDao implements DealerDao {
                 }
             }
 
+            // Check if there are associated records in the lease_contracts table
+            String checkLeaseContractsQuery = "SELECT COUNT(*) FROM lease_contracts WHERE vin = ?";
+            try (PreparedStatement checkLeaseContractsStatement = connection.prepareStatement(checkLeaseContractsQuery)) {
+                checkLeaseContractsStatement.setString(1, vin);
+                try (ResultSet resultSet = checkLeaseContractsStatement.executeQuery()) {
+                    resultSet.next();
+                    int count = resultSet.getInt(1);
+                    if (count > 0) {
+                        // There are associated records in the lease_contracts table, delete them first
+                        String deleteLeaseContractsQuery = "DELETE FROM lease_contracts WHERE vin = ?";
+                        try (PreparedStatement deleteLeaseContractsStatement = connection.prepareStatement(deleteLeaseContractsQuery)) {
+                            deleteLeaseContractsStatement.setString(1, vin);
+                            deleteLeaseContractsStatement.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            // Check if there are associated records in the sales_contract table
+            String checkSalesContractQuery = "SELECT COUNT(*) FROM sales_contracts WHERE vin = ?";
+            try (PreparedStatement checkSalesContractStatement = connection.prepareStatement(checkSalesContractQuery)) {
+                checkSalesContractStatement.setString(1, vin);
+                try (ResultSet resultSet = checkSalesContractStatement.executeQuery()) {
+                    resultSet.next();
+                    int count = resultSet.getInt(1);
+                    if (count > 0) {
+                        // There are associated records in the sales_contract table, delete them first
+                        String deleteSalesContractQuery = "DELETE FROM sales_contracts WHERE vin = ?";
+                        try (PreparedStatement deleteSalesContractStatement = connection.prepareStatement(deleteSalesContractQuery)) {
+                            deleteSalesContractStatement.setString(1, vin);
+                            deleteSalesContractStatement.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            // Continue with the rest of the delete operation as before
             // Delete the vehicle from the vehicle table
             String deleteVehicleQuery = "DELETE FROM vehicle WHERE vin = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteVehicleQuery)) {
-                preparedStatement.setString(1, vin);
-
-                int rowsAffected = preparedStatement.executeUpdate();
+            try (PreparedStatement deleteVehicleStatement = connection.prepareStatement(deleteVehicleQuery)) {
+                deleteVehicleStatement.setString(1, vin);
+                int rowsAffected = deleteVehicleStatement.executeUpdate();
                 if (rowsAffected == 1) {
                     System.out.println("Vehicle with VIN " + vin + " deleted successfully.");
                     return true; // Return true indicating successful deletion
@@ -333,6 +369,123 @@ public class DatabaseDealerDao implements DealerDao {
             return false; // Return false indicating failure to delete (due to exception)
         }
     }
+
+    @Override
+    public void sellCar(String vin) {
+        try (Connection connection = dataSource.getConnection()) {
+            // Update the vehicle table to mark the car as sold
+            String updateSql = "UPDATE vehicle SET sold = 'Yes' WHERE vin = ?";
+            try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+                updateStatement.setString(1, vin);
+                int updateRowsAffected = updateStatement.executeUpdate();
+                if (updateRowsAffected == 1) {
+                    System.out.println("Vehicle Sold successfully.");
+                } else {
+                    System.err.println("Error: Failed to sell vehicle. Vehicle with VIN " + vin + " not found.");
+                    return;
+                }
+            }
+
+            // Insert the VIN into the sales_contract table
+            String insertSql = "INSERT INTO sales_contracts (vin) VALUES (?)";
+            try (PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
+                insertStatement.setString(1, vin);
+                int insertRowsAffected = insertStatement.executeUpdate();
+                if (insertRowsAffected == 1) {
+                    System.out.println("Vehicle VIN inserted into sales contract successfully.");
+                } else {
+                    System.err.println("Error: Failed to insert vehicle VIN into sales contract.");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error selling vehicle: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void leaseCar(String vin) {
+        try (Connection connection = dataSource.getConnection()) {
+            // Update the vehicle table to mark the car as sold
+            String updateSql = "UPDATE vehicle SET sold = 'No' WHERE vin = ?";
+            try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+                updateStatement.setString(1, vin);
+                int updateRowsAffected = updateStatement.executeUpdate();
+                if (updateRowsAffected == 1) {
+                    System.out.println("Vehicle leased successfully.");
+                } else {
+                    System.err.println("Error: Failed to lease vehicle. Vehicle with VIN " + vin + " not found.");
+                    return;
+                }
+            }
+
+            // Insert the VIN into the sales_contract table
+            String insertSql = "INSERT INTO lease_contracts (vin) VALUES (?)";
+            try (PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
+                insertStatement.setString(1, vin);
+                int insertRowsAffected = insertStatement.executeUpdate();
+                if (insertRowsAffected == 1) {
+                    System.out.println("Vehicle VIN inserted into sales contract successfully.");
+                } else {
+                    System.err.println("Error: Failed to insert vehicle VIN into sales contract.");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error selling vehicle: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public List<Vehicle> getAllSaleContracts() {
+        List<Vehicle> vehicles = new ArrayList<>();
+        String sqlQuery = "SELECT V.* FROM dealership.vehicle AS V JOIN dealership.sales_contracts AS S ON V.vin = S.vin;";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+             ResultSet resultSet = preparedStatement.executeQuery();
+        ) {
+            while (resultSet.next()) {
+                Vehicle vehicle = VehicleUtils.resultSetToVehicle(resultSet);
+
+                // Add the Vehicle object to the list
+                vehicles.add(vehicle);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving data from table: " + e.getMessage());
+        }
+        return vehicles;
+    }
+
+    @Override
+    public  List<Vehicle> getAllLeaseContracts(){
+        List<Vehicle> vehicles = new ArrayList<>();
+        String sqlQuery = "SELECT V.* FROM vehicle AS V JOIN lease_contracts AS L ON V.vin = L.vin;";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+             ResultSet resultSet = preparedStatement.executeQuery();
+        ) {
+            while (resultSet.next()) {
+                Vehicle vehicle = VehicleUtils.resultSetToVehicle(resultSet);
+
+                // Add the Vehicle object to the list
+                vehicles.add(vehicle);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving data from table: " + e.getMessage());
+        }
+        return vehicles;
+    }
+
+@Override
+    public List<Vehicle> getAllContracts(){
+        List<Vehicle> vehicles = new ArrayList<>();
+        vehicles.addAll(getAllLeaseContracts());
+        vehicles.addAll(getAllSaleContracts());
+        return vehicles;
+    }
+
+
 
 }
 

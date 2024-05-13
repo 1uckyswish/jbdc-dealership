@@ -263,9 +263,54 @@ public class UserInterface {
 
 
     private void adminDisplay() {
+        //Greet user and collect login info
+        System.out.println("\nWelcome to the Contract Administration System!\nPlease log in to proceed.");
+        System.out.print("Enter your admin username: ");
+        String username = scanner.nextLine().trim();
+        System.out.print("Enter your admin password: ");
+        String password = scanner.nextLine().trim();
+        if (!password.equalsIgnoreCase("ABC123")) {
+            System.out.println("\nIncorrect password. Access denied.");
+            System.out.println("Returning back home...\n");
+        }else {
+            System.out.println("\nWelcome back, " + username + "!");
+            System.out.println("Loading the Contract Administration System...\n");
+
+            //Instantiate an admin Object to access the method to display the options to choose from
+            AdminUserInterface admin = new AdminUserInterface(dealerDao);
+            admin.display();
+            String choice = scanner.nextLine().trim();
+            // Display the chosen contracts
+            switch (choice) {
+                case "1":
+                    admin.viewAllContracts();
+                    break;
+                case "2":
+                    admin.viewSaleContracts();
+                    break;
+                case "3":
+                    admin.viewLeaseContracts();
+                    break;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+                    System.out.println("Returning to the main menu...\n");
+            }
+        }
     }
 
     private void processRecordOfSaleOrLease() {
+        System.out.println();
+        String saleOrLease = validateStringInput(scanner, "Would you like to Sell or Lease Vehicle: ");
+        if(saleOrLease.equalsIgnoreCase("Sell")){
+            String vin = validateStringInput(scanner, "Please enter the VIN # of the vehicle: ");
+            dealerDao.sellCar(vin);
+        } else if (saleOrLease.equalsIgnoreCase("Lease")) {
+            String vin = validateStringInput(scanner, "Please enter the VIN # of the vehicle: ");
+            dealerDao.leaseCar(vin);
+        }else{
+            System.out.println("\n~~~ Sorry wrong choice. " + saleOrLease + " is an Invalid entry ~~~\n");
+        }
+
     }
 
     public String displayHomeScreen(){

@@ -17,4 +17,9 @@ public interface DealerDao {
     void create(Vehicle vehicle);
     void update(String vin,Vehicle vehicle );
     boolean delete(String vin);
+    void sellCar(String vin);
+    void leaseCar(String vin);
+    List<Vehicle> getAllContracts();
+    List<Vehicle> getAllSaleContracts();
+    List<Vehicle> getAllLeaseContracts();
 }
