@@ -86,3 +86,15 @@ This is the heart of our Java Car Dealership project. The Main class manages all
 
 ![Screenshot 2024-05-13 at 3 50 22 PM](https://github.com/1uckyswish/jbdc-dealership/assets/107442415/c535a090-8cb2-49c1-b9eb-d1d7cab6a0b5)
 ![Screenshot 2024-05-13 at 3 50 31 PM](https://github.com/1uckyswish/jbdc-dealership/assets/107442415/75454865-381a-4feb-baee-c241c79cbd18)
+
+
+## Interesting Section of code
+
+The application's main class, Program, orchestrates the initialization of the database connection and the user interface. Here's a snippet showcasing its simplicity and clarity:
+
+![Screenshot 2024-05-13 at 3 57 48 PM](https://github.com/1uckyswish/jbdc-dealership/assets/107442415/560678c2-3910-4c05-8dd9-81fbcc04caee)
+![Screenshot 2024-05-13 at 3 57 55 PM](https://github.com/1uckyswish/jbdc-dealership/assets/107442415/88892830-148a-472c-8bf2-8a57ad819787)
+
+
+This elegant design encapsulates database operations and user interaction seamlessly, ensuring a smooth and efficient user experience.
+
