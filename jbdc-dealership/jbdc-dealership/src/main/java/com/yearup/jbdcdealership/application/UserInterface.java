@@ -88,12 +88,59 @@ public class UserInterface {
     }
 
     private void processUpdateVehicleRequest() {
+        // Pass the question and scanner into the method to validate the correct input
+        // data Type
+        String vinChoice = validateStringInput(scanner, "Please enter the VIN of the vehicle to update: ");
+        int year = validateIntInput(scanner, "Please enter the year of the vehicle: ");
+        scanner.nextLine(); // Consume newline character
+        String make = validateStringInput(scanner, "Please enter the make of the vehicle: ");
+        String model = validateStringInput(scanner, "Please enter the model of the vehicle: ");
+        String vehicleType = validateStringInput(scanner, "Please enter the type of the vehicle (e.g., sedan, SUV): ");
+        String color = validateStringInput(scanner, "Please enter the color of the vehicle: ");
+        int odometer = validateIntInput(scanner, "Please enter the current mileage of the vehicle: ");
+        double price = validateDoubleInput(scanner, "Please enter the price of the vehicle for sale: ");
+        scanner.nextLine(); // Consume newline character
+        // Pass all the variable to make a new Vehicle using its constructor
+        Vehicle newVehicleMade = new Vehicle(vinChoice, year, make, model, vehicleType, color, odometer, price, "No");
+        dealerDao.update(vinChoice, newVehicleMade);
+        // Show the new Vehicle they added
+        System.out.println("==== Vehicle Updated ====");
+        System.out.println(newVehicleMade);
     }
 
     private void processRemoveVehicleRequest() {
+        // Pass the question and scanner into the method to validate the correct input
+        // data Type
+        String vinChoice = validateStringInput(scanner, "Please enter the VIN of the vehicle to remove: ");
+        boolean deleted = dealerDao.delete(vinChoice);
+
+        if (deleted) {
+            // Deletion was successful
+            System.out.println("Vehicle with VIN " + vinChoice + " was successfully removed from database.");
+        } else {
+            // Deletion failed (vehicle not found or other error)
+            System.out.println("Failed to remove vehicle with VIN " + vinChoice + ".");
+        }
     }
 
     private void processAddVehicleRequest() {
+        String vin = validateStringInput(scanner, "Please enter the VIN # of the vehicle: ");
+        int year = validateIntInput(scanner, "Please enter the year of the vehicle: ");
+        scanner.nextLine(); // Consume newline character
+        String make = validateStringInput(scanner, "Please enter the make of the vehicle: ");
+        String model = validateStringInput(scanner, "Please enter the model of the vehicle: ");
+        String vehicleType = validateStringInput(scanner, "Please enter the type of the vehicle (e.g., sedan, SUV): ");
+        String color = validateStringInput(scanner, "Please enter the color of the vehicle: ");
+        int odometer = validateIntInput(scanner, "Please enter the current mileage of the vehicle: ");
+        double price = validateDoubleInput(scanner, "Please enter the price of the vehicle for sale: ");
+        scanner.nextLine(); // Consume newline character
+
+        // Pass all the variable to make a new Vehicle using its constructor
+        Vehicle newVehicleMade = new Vehicle(vin, year, make, model, vehicleType, color, odometer, price, "No");
+        dealerDao.create(newVehicleMade);
+        // Show the new Vehicle they added
+        System.out.println("==== New Vehicle Added ====");
+        System.out.println(newVehicleMade);
     }
 
     private void processGetAllVehiclesRequest() {
@@ -103,18 +150,97 @@ public class UserInterface {
     }
 
     private void processGetByVehicleTypeRequest() {
+        System.out.print("Please specify the type of vehicle you are looking for\n");
+        // When it returns make it lowerCase for the easier checking below
+        String typeChoice = validateStringInput(scanner, "Please enter the type of vehicle: ").toLowerCase();
+        vehicles = dealerDao.getByType(typeChoice);
+        // If the Arraylist values returned are true within the range, display them all
+        if (!vehicles.isEmpty()) {
+            System.out.println("\n==== Vehicle Results By Type ====");
+            // Passing the ArrayLost that hold the values pass it to a method that iterates
+            // through it and displays it
+            displayVehicles(vehicles);
+        } else {
+            // if no values are found inform user
+            System.out.println("\n==== Sorry, there are no vehicles available for the specified type ===\n");
+        }
     }
 
     private void processGetByMileageRequest() {
+        System.out.print("Please specify the desired mileage for a vehicle\n");
+        int minMileageChoice = validateIntInput(scanner, "Please enter the MIN desired mileage: ");
+        int maxmileageChoice = validateIntInput(scanner, "Please enter the MAX desired mileage: ");
+        scanner.nextLine(); // Consume newline buffer
+        // Pass the value the user submitted to the method of the dealership to do the
+        // checking
+        vehicles = dealerDao.getByMileage(minMileageChoice, maxmileageChoice);
+        // If the Arraylist values returned are true within the range, display them all
+        if (!vehicles.isEmpty()) {
+            System.out.println("\n==== Vehicle Results By Mileage ====");
+            // Passing the ArrayLost that hold the values pass it to a method that iterates
+            // through it and displays it
+            displayVehicles(vehicles);
+        } else {
+            // if no values are found inform user
+            System.out.println("\n==== Sorry, there are no vehicles available with the specified mileage range ===\n");
+        }
     }
 
     private void processGetByColorRequest() {
+        System.out.print("Please specify the color of the car you are looking for\n");
+        // When it returns make it lowerCase for the easier checking below
+        String colorChoice = validateStringInput(scanner, "Please enter the car color: ").toLowerCase();
+        // Pass the value the user submitted to the method of the dealership to do the
+        // checking
+        vehicles = dealerDao.getByColor(colorChoice);
+        // If the Arraylist values returned are true within the range, display them all
+        if (!vehicles.isEmpty()) {
+            System.out.println("\n==== Vehicle Results By Color ====");
+            // Passing the ArrayLost that hold the values pass it to a method that iterates
+            // through it and displays it
+            displayVehicles(vehicles);
+        } else {
+            // if no values are found inform user
+            System.out.println("\n==== Sorry, there are no vehicles available in the specified color ====\n");
+        }
     }
 
     private void processGetByYearRequest() {
+        System.out.print("Please specify the year you are looking for\n");
+        int yearChoice = validateIntInput(scanner, "Please enter the year: ");
+        scanner.nextLine(); // Consume newline buffer
+        vehicles = dealerDao.getByYear(yearChoice);
+        if (!vehicles.isEmpty()) {
+            System.out.println("\n==== Vehicle Results By Year ====");
+            // Passing the ArrayList that hold the values pass it to a method that iterates
+            // through it and displays it
+            displayVehicles(vehicles);
+        } else {
+            // if no values are found inform user
+            System.out.println("\n==== Sorry, there are no vehicles available for the specified year ====\n");
+        }
+
     }
 
     private void processGetByMakeModelRequest() {
+        System.out.print("Please specify the make: ");
+        String makeName = validateStringInput(scanner, "Please enter the make name: ").toLowerCase();
+
+        System.out.print("Please specify the model: ");
+        String modelName = validateStringInput(scanner, "Please enter the model name: ").toLowerCase();
+
+        vehicles = dealerDao.getByMakeModel(makeName, modelName);
+        // If the Arraylist values returned are true within the range, display them all
+        if (!vehicles.isEmpty()) {
+            // Passing the ArrayLost that hold the values pass it to a method that iterates
+            // through it and displays it
+            System.out.println("\n==== Vehicle Results By Make And Model ====");
+            displayVehicles(vehicles);
+        } else {
+            // if no values are found inform user
+            System.out.println(
+                    "\n=== Sorry, there are no vehicles available matching the specified make and model name ===\n");
+        }
     }
 
     private void processGetByPriceRequest() {

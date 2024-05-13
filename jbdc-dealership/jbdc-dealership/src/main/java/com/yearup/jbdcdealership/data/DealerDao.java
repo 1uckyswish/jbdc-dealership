@@ -16,5 +16,5 @@ public interface DealerDao {
     Vehicle getByVin(String vin);
     void create(Vehicle vehicle);
     void update(String vin,Vehicle vehicle );
-    void delete(String vin);
+    boolean delete(String vin);
 }
