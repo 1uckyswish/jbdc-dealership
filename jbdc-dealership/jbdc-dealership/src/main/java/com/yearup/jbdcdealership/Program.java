@@ -3,7 +3,6 @@ package com.yearup.jbdcdealership;
 import com.yearup.jbdcdealership.application.UserInterface;
 import com.yearup.jbdcdealership.data.DatabaseConnector;
 import com.yearup.jbdcdealership.data.DatabaseDealerDao;
-import com.yearup.jbdcdealership.models.Vehicle;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 public class Program {
